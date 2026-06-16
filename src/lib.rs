@@ -1,10 +1,8 @@
-use kovi::bot::SendApi;
-use kovi::bot::runtimebot::send_api_request_with_response;
+use kovi::Message;
+use kovi::bot::runtimebot::{RuntimeBot, send_api_request_with_response};
+use kovi::bot::{ApiReturn, SendApi};
 use kovi::serde_json::{self, json};
-use kovi::{
-    Message,
-    bot::{ApiReturn, message::Segment, runtimebot::RuntimeBot},
-};
+use kovi_onebot::onebot_message::OneBotSegment;
 use serde::{Deserialize, Serialize};
 
 // #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -1362,7 +1360,7 @@ impl NapCatApi for RuntimeBot {
     }
 }
 
-pub type Node = Segment;
+pub type Node = OneBotSegment;
 
 pub trait NapCatVec {
     /// 伪造合并转发消息, 无需伪造使用 add_forward_node()
@@ -1394,7 +1392,7 @@ pub trait NapCatVec {
     ///
     /// bot.send_private_msg(bot.main_admin, nodes);
     /// ```
-    fn add_fake_node_from_id(self, user_id: &str, nickname: &str, id: &str) -> Vec<Segment>;
+    fn add_fake_node_from_id(self, user_id: &str, nickname: &str, id: &str) -> Vec<OneBotSegment>;
 
     /// 伪造合并转发消息, 无需伪造使用 push_fake_forward_node()
     ///
@@ -1474,8 +1472,8 @@ impl NapCatVec for Vec<Node> {
         user_id: &str,
         nickname: &str,
         content: Message,
-    ) -> Vec<Segment> {
-        self.push(Segment {
+    ) -> Vec<OneBotSegment> {
+        self.push(OneBotSegment {
             type_: "node".to_string(),
             data: json!({
                 "user_id": user_id,
@@ -1486,7 +1484,7 @@ impl NapCatVec for Vec<Node> {
         self
     }
     fn push_fake_node_from_content(&mut self, user_id: &str, nickname: &str, content: Message) {
-        self.push(Segment {
+        self.push(OneBotSegment {
             type_: "node".to_string(),
             data: json!({
                 "user_id": user_id,
@@ -1495,8 +1493,13 @@ impl NapCatVec for Vec<Node> {
             }),
         });
     }
-    fn add_fake_node_from_id(mut self, user_id: &str, nickname: &str, id: &str) -> Vec<Segment> {
-        self.push(Segment {
+    fn add_fake_node_from_id(
+        mut self,
+        user_id: &str,
+        nickname: &str,
+        id: &str,
+    ) -> Vec<OneBotSegment> {
+        self.push(OneBotSegment {
             type_: "node".to_string(),
             data: json!({
                 "id": id,
@@ -1508,7 +1511,7 @@ impl NapCatVec for Vec<Node> {
     }
 
     fn push_fake_node_from_id(&mut self, user_id: &str, nickname: &str, id: &str) {
-        self.push(Segment {
+        self.push(OneBotSegment {
             type_: "node".to_string(),
             data: json!({
                 "id": id,
@@ -1518,8 +1521,8 @@ impl NapCatVec for Vec<Node> {
         });
     }
 
-    fn add_node_from_id(mut self, id: &str) -> Vec<Segment> {
-        self.push(Segment {
+    fn add_node_from_id(mut self, id: &str) -> Vec<OneBotSegment> {
+        self.push(OneBotSegment {
             type_: "node".to_string(),
             data: json!({
                 "id": id,
@@ -1529,7 +1532,7 @@ impl NapCatVec for Vec<Node> {
     }
 
     fn push_node_from_id(&mut self, id: &str) {
-        self.push(Segment {
+        self.push(OneBotSegment {
             type_: "node".to_string(),
             data: json!({
                 "id": id,
@@ -1537,8 +1540,8 @@ impl NapCatVec for Vec<Node> {
         });
     }
 
-    fn add_node_from_content(mut self, content: Message) -> Vec<Segment> {
-        self.push(Segment {
+    fn add_node_from_content(mut self, content: Message) -> Vec<OneBotSegment> {
+        self.push(OneBotSegment {
             type_: "node".to_string(),
             data: json!({
                 "content": content,
@@ -1548,7 +1551,7 @@ impl NapCatVec for Vec<Node> {
     }
 
     fn push_node_from_content(&mut self, content: Message) {
-        self.push(Segment {
+        self.push(OneBotSegment {
             type_: "node".to_string(),
             data: json!({
                 "content": content,
